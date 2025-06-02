@@ -1,3 +1,21 @@
 #root {
   text-align: center;
 }
+
+@font-face {
+  font-family: 'D-din';
+  src: url('/src/assets/fonts/D-DIN.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'D-din';
+  src: url('/src/assets/fonts/D-DIN-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+* {
+  font-family: 'D-din', sans-serif;
+}

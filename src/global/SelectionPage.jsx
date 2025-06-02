@@ -1,5 +1,6 @@
 import React from 'react';
 import { states } from '../data';
+import { isColorTooLight } from '../functions';
 
 const SelectionPage = ({ setSelection, takenStates }) => {
   // takenStates: an array of strings with already selected state names
@@ -36,15 +37,20 @@ const SelectionPage = ({ setSelection, takenStates }) => {
                 display: 'grid',
                 gridTemplateColumns: '25% 25% 25%',
                 justifyContent: 'center',
-                backgroundColor: isTaken ? '#555555' : '#000000', // Dim if taken
-                borderRadius: '2em',
+                alignItems: 'center',
+                backgroundColor: isTaken ? '#555555' : state.color ?? '#000000', // Dim if taken
+                color: state.color && isColorTooLight(state.color) ? '#000000' : '#ffffff',
+                borderRadius: '1em',
                 cursor: isTaken ? 'not-allowed' : 'pointer',
                 opacity: isTaken ? 0.6 : 1,
+                fontSize: 42,
+                fontWeight: 'bold',
+                marginBottom: '0.5em',
               }}
             >
-              <div>img</div>
+              <img src={state.icon} alt={"logo"} style={{width: '50%', filter: state.color && isColorTooLight(state.color) ? 'invert(1) sepia(1) saturate(10000%) hue-rotate(180deg)' : ''}}/>
               <div>{state.name}</div>
-              <div>{state.capital}</div>
+              <div style={{fontWeight: 'normal', fontSize: 36}}>{state.capital}</div>
             </div>
           );
         })}

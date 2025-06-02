@@ -3,8 +3,9 @@ import { useMissiles } from './hooks/useMissiles'; // Import the custom hook
 import { io } from 'socket.io-client'; // Socket.IO client library
 import Globe from './global/Globe';
 import SelectionPage from './global/SelectionPage';
-import { getSessionCookie } from './functions';
+import { areEqual, getSessionCookie } from './functions';
 import AxesArrows from './components/AxesArrows';
+import { states } from './data';
 
 const Base_url = "http://localhost:3001"; // Base URL for your server
 
@@ -45,15 +46,11 @@ const Game = () => {
   const _socket = io(Base_url);
 
 
-  useLayoutEffect(() => {
+  useEffect(() => {
 
     _socket.on('whoami:success', (userData) => {
       setSelectedState(userData.name);
       console.log('User identified:', userData.name);
-    });
-
-    _socket.on('whoami:failure', () => {
-      console.log('Invalid session');
     });
 
     const session = getSessionCookie();
@@ -62,9 +59,7 @@ const Game = () => {
     }
 
     return () => {
-      _socket.off('selection:takenStates');
       _socket.off('whoami:success');
-      _socket.off('whoami:failure');
     };
   }, []);
 
@@ -77,8 +72,6 @@ const Game = () => {
 
     return () => {
       _socket.off('selection:takenStates');
-      _socket.off('whoami:success');
-      _socket.off('whoami:failure');
     };
   }, []);
 
@@ -153,10 +146,10 @@ const Game = () => {
 
 
       // Listener for when a player disconnects
-      socket.on('player:disconnected', ({ session: disconnectedSession }) => {
-        console.log(`Player with session ${disconnectedSession} disconnected.`);
-        // setBases((prev) => prev.filter(base => base.session !== disconnectedSession));
-      });
+      // socket.on('player:disconnected', ({ session: disconnectedSession }) => {
+      //   console.log(`Player with session ${disconnectedSession} disconnected.`);
+      //   // setBases((prev) => prev.filter(base => base.session !== disconnectedSession));
+      // });
 
       // Cleanup function: Disconnect the socket when the component unmounts
       return () => {
@@ -196,7 +189,7 @@ const Game = () => {
     <>
       {selectedState ? (
         <>
-          <Globe missiles={missiles} bases={bases} basePosition={basePosition} />
+          <Globe selectedState={selectedState} missiles={missiles} bases={bases} basePosition={basePosition} />
           {/* Fixed Corner Axes */}
           <div
             style={{
@@ -216,10 +209,11 @@ const Game = () => {
               <button
                 style={{
                   position: 'absolute',
-                  top: '20px',
+                  top: '2%',
                   left: '20px',
                   padding: '10px 20px',
-                  fontSize: '16px',
+                  fontSize: 22,
+                  fontWeight: 'bold',
                   cursor: 'pointer',
                   backgroundColor: '#0a0a0a',
                   color: 'white',
@@ -236,7 +230,7 @@ const Game = () => {
               <div
                 style={{
                   position: 'absolute',
-                  top: '80px',
+                  top: '10%',
                   left: '20px',
                   backgroundColor: '#0a0a0a',
                   padding: '10px',
@@ -279,6 +273,31 @@ const Game = () => {
                   />
                 </div>
               </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '30%',
+                  left: '20px',
+                  backgroundColor: '#0a0a0a',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  color: 'white',
+                  width: '200px',
+                }}
+              >
+                <div style={{display: 'grid', gridTemplateColumns: '25% 25% 25%', gap: '2em', justifyContent: 'center', alignItems: 'center'}}>
+                  <img src={states.find(state => state.name === selectedState)?.icon} style={{width: '3em', height: 'auto'}}/>
+                  <span>{basePosition && basePosition[0]}</span>
+                  <span>{basePosition && basePosition[1]}</span>
+                </div>
+                {bases.filter(base => !areEqual(basePosition, base.startLatLon)).map((base, index) => (
+                  <div key={index} style={{display: 'grid', gridTemplateColumns: '25% 25% 25%', gap: '2em', justifyContent: 'center', alignItems: 'center'}}>
+                    <img src={states.find(state => state.name === base.name)?.icon} style={{width: '3em', height: 'auto'}}/>
+                    <span>{base?.startLatLon[0]}</span>
+                    <span>{base?.startLatLon[1]}</span>
+                  </div>
+                ))}
+              </div>
             </>
           )}
           {isGameOver && (
@@ -288,14 +307,16 @@ const Game = () => {
                 top: '80px',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                backgroundColor: '#0a0a0a',
+                backgroundColor: 'rgba(0, 0, 0, 0)',
                 padding: '10px',
                 borderRadius: '5px',
                 color: 'red',
                 width: '200px',
+                fontSize: 52,
+                fontWeight: 'bold',
               }}
             >
-              Game over
+              Defeat
             </div>
           )}
           {isWin && (
@@ -305,11 +326,13 @@ const Game = () => {
                 top: '80px',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                backgroundColor: '#0a0a0a',
+                backgroundColor: 'rgba(0, 0, 0, 0)',
                 padding: '10px',
                 borderRadius: '5px',
                 color: 'green',
                 width: '200px',
+                fontSize: 52,
+                fontWeight: 'bold',
               }}
             >
               Victory

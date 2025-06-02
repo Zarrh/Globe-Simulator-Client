@@ -6,6 +6,7 @@ import { drawThreeGeo } from '../utils/threeGeoJSON';
 import Missile from '../components/Missile';
 import Base from '../components/Base';
 import { areEqual } from '../functions';
+import { states } from '../data';
 
 // Component to load and render GeoJSON data on the sphere
 const GeoJSONLayer = ({ url, radius }) => {
@@ -45,7 +46,7 @@ const WireframeSphere = ({ radius }) => {
 };
 
 // Main Globe component
-const Globe = ({ missiles, bases, basePosition}) => {
+const Globe = ({ selectedState, missiles, bases, basePosition}) => {
   const radius = 2; // Radius of the globe
 
   return (
@@ -78,13 +79,14 @@ const Globe = ({ missiles, bases, basePosition}) => {
             key={index} // Unique key for each base
             startLatLon={base.startLatLon}
             radius={radius}
+            color={states.find(state => state.name === base.name)?.color ?? "grey"}
           />
         ))}
         {basePosition && (
           <Base
             startLatLon={basePosition}
             radius={radius}
-            color={"blue"}
+            color={states.find(state => state.name === selectedState)?.color ?? "blue"}
           />
         )}
       </Canvas>
