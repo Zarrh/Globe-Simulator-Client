@@ -1,25 +1,30 @@
 import { useEffect } from 'react';
-import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3001');
-
-export function useMissiles(name, session, onMissileReceived) {
+export function useMissiles(socket, name, session, onMissileReceived) {
   useEffect(() => {
-    // Join with session
-    socket.emit('player:join', { name, session });
+    if (!socket) {
+      console.warn("useMissiles: Socket instance not provided.");
+      return;
+    }
 
-    // Listen for missiles from others
+    // Listen for missiles launched by other players
     socket.on('missile:launched', (data) => {
+      // Call the provided callback function when a missile is received
       onMissileReceived(data);
     });
 
     return () => {
-      socket.disconnect();
+      socket.off('missile:launched', onMissileReceived); // Remove the specific listener
     };
-  }, [name, session, onMissileReceived]);
+  }, [socket, name, session, onMissileReceived]); // Dependencies for this effect
 
+  // Function to launch a missile
   const launchMissile = (missileData) => {
-    socket.emit('missile:launch', missileData);
+    if (socket) {
+      socket.emit('missile:launch', missileData);
+    } else {
+      console.warn("Cannot launch missile: Socket is not connected.");
+    }
   };
 
   return { launchMissile };

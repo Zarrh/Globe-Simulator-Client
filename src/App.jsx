@@ -1,12 +1,11 @@
-import './App.css'
-import Globe from './components/Globe'
+import './App.css';
+import Game from './Game';
 
 function App() {
-  return (
-    <>
-      <Globe />
-    </>
-  )
-}
 
-export default App
+  return (
+    <Game />
+  );
+};
+
+export default App;
