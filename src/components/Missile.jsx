@@ -31,12 +31,61 @@ function createRadialGradientTexture() {
 }
 
 
+// Convert spherical coordinates to cartesian
+function sphericalToCartesian(startLatLon, radius) {
+  if (!startLatLon || startLatLon.length !== 2) {
+    console.warn("Defaulting coordinates");
+    startLatLon = [0, 0];
+  }
+  const [lat, lon] = startLatLon;
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+
+  const x = -radius * Math.sin(phi) * Math.cos(theta);
+  const y = radius * Math.cos(phi);
+  const z = radius * Math.sin(phi) * Math.sin(theta);
+
+  return new THREE.Vector3(x, y, z);
+}
+
+
+function computeVelocityVector(launchPoint, velocityMagnitude, azimuthDeg, elevationDeg, startLon) {
+  const up = launchPoint.clone().normalize();
+
+  // console.log(startLon)
+
+  // Global Z-axis
+  const globalZ = new THREE.Vector3(0, 0, 1);
+
+  // North vector: project global Z onto the tangent plane at launchPoint
+  const north = globalZ.clone().sub(up.clone().multiplyScalar(globalZ.dot(up))).normalize();
+
+  // East vector: perpendicular to both up and north
+  const east = new THREE.Vector3().crossVectors(north, up).normalize();
+
+  // Convert angles to radians
+  const azimuth = THREE.MathUtils.degToRad(azimuthDeg+94-startLon); // 94...
+  const elevation = THREE.MathUtils.degToRad(elevationDeg);
+
+  const vHorizontal = velocityMagnitude * Math.cos(elevation);
+  const vVertical = velocityMagnitude * Math.sin(elevation);
+
+  const velocity = new THREE.Vector3();
+  velocity.add(north.clone().multiplyScalar(vHorizontal * Math.cos(azimuth)));
+  velocity.add(east.clone().multiplyScalar(vHorizontal * Math.sin(azimuth)));
+  velocity.add(up.clone().multiplyScalar(vVertical));
+
+  return velocity;
+}
+
+
 function Missile({
   startLatLon,
   radius = 2,
   initialVelocity = [0.5, 0.5, 0.5],
   gravity = 9.8 * 6371 / 6371,
   launched,
+  lineColor="yellow",
 }) {
   const pointRef = useRef();
   const glowRef = useRef();
@@ -49,31 +98,19 @@ function Missile({
 
   const glowTexture = useMemo(() => createRadialGradientTexture(), []);
 
-  // Convert spherical coordinates to cartesian
-  function sphericalToCartesian(startLatLon, radius) {
-    if (!startLatLon || startLatLon.length !== 2) {
-      console.warn("Defaulting coordinates");
-      startLatLon = [0, 0];
-    }
-    const [lat, lon] = startLatLon;
-    const phi = (90 - lat) * (Math.PI / 180);
-    const theta = (lon + 180) * (Math.PI / 180);
-
-    const x = -radius * Math.sin(phi) * Math.cos(theta);
-    const y = radius * Math.cos(phi);
-    const z = radius * Math.sin(phi) * Math.sin(theta);
-
-    return new THREE.Vector3(x, y, z);
-  }
+  const [startTime, setStartTime] = useState(null);
+  const [deletionStarted, setDeletionStarted] = useState(false);
 
   // Reset missile state on launch/startLatLon change
   useEffect(() => {
     const startPos = sphericalToCartesian(startLatLon, radius);
     position.current.copy(startPos);
-    velocity.current.set(...initialVelocity);
+    velocity.current.set(...computeVelocityVector(startPos, initialVelocity[0], initialVelocity[1], initialVelocity[2], startLatLon[1]));
     stopped.current = false;
     setExploded(false);
     setPositions([startPos.clone()]);
+    setStartTime(Date.now());
+    setDeletionStarted(false);
   }, [startLatLon, radius, initialVelocity]);
 
   useEffect(() => {
@@ -87,7 +124,7 @@ function Missile({
 
       position.current.add(velocity.current.clone().multiplyScalar(0.016));
 
-      if (position.current.lengthSq() < (0.95 * radius) ** 2) {
+      if (position.current.lengthSq() < (0.98 * radius) ** 2) {
         stopped.current = true;
         setExploded(true);
         clearInterval(intervalId);
@@ -113,12 +150,47 @@ function Missile({
     return () => clearInterval(intervalId);
   }, [launched, radius, gravity, exploded]);
 
+
+  // Start deleting positions rapidly after 15 seconds
+  useEffect(() => {
+    if (!launched) return;
+
+    const deletionInterval = setInterval(() => {
+      if (!startTime) return;
+
+      const elapsed = (Date.now() - startTime) / 1000;
+      if (elapsed >= 7.5) {
+        setDeletionStarted(true);
+      }
+    }, 500);
+
+    return () => clearInterval(deletionInterval);
+  }, [launched, exploded, startTime]);
+
+  // Rapidly remove positions from the start once deletion has started
+  useEffect(() => {
+    if (!deletionStarted) return;
+
+    const rapidDeletion = setInterval(() => {
+      setPositions((prev) => {
+        if (prev.length > 1) {
+          return prev.slice(1); // remove the first point
+        } else {
+          clearInterval(rapidDeletion);
+          return prev;
+        }
+      });
+    }, 16); // ~60fps
+
+    return () => clearInterval(rapidDeletion);
+  }, [deletionStarted]);
+
   return (
     <>
       {positions.length > 1 && (
         <Line
           points={positions.map((pos) => pos.toArray())}
-          color="yellow"
+          color={lineColor}
           lineWidth={2}
         />
       )}
@@ -126,7 +198,7 @@ function Missile({
         <>
           {/* Core red sphere */}
           <mesh ref={pointRef}>
-            <sphereGeometry args={[0.05, 16, 16]} />
+            <sphereGeometry args={[0.025, 16, 16]} />
             <meshBasicMaterial color="red" />
           </mesh>
 

@@ -1,4 +1,4 @@
-import { Chinalogo, Egyptlogo, Francelogo, Indialogo, Japanlogo, Romanlogo, UKlogo, USAlogo } from "../assets/logos";
+import { Brazillogo, Canadalogo, Chinalogo, Egyptlogo, Francelogo, Germanylogo, Greecelogo, HongKonglogo, Indialogo, Japanlogo, Norwaylogo, Romanlogo, Russialogo, Sumerialogo, UKlogo, USAlogo } from "../assets/logos";
 
 export const states = [
   {
@@ -6,47 +6,191 @@ export const states = [
     capital: "Washington",
     icon: USAlogo,
     color: "#090aff",
+    cities: [
+      "Washington",
+      "Houston",
+      "Boston",
+      "San Francisco",
+    ],
   },
   {
     name: "Roman Empire",
     capital: "Rome",
     icon: Romanlogo,
     color: "#7716b5",
+    cities: [
+      "Rome",
+      "Milan",
+      "Venice",
+      "Trieste",
+    ],
   },
   {
     name: "United Kingdom",
     capital: "London",
     icon: UKlogo,
     color: "#bf0818",
+    cities: [
+      "London",
+      "Edinburgh",
+      "Dublin",
+      "Manchester",
+    ],
   },
   {
     name: "France",
     capital: "Paris",
     icon: Francelogo,
     color: "#4c8eff",
+    cities: [
+      "Paris",
+      "Marseille",
+      "Nantes",
+      "Geneve",
+    ],
   },
   {
     name: "Japan",
     capital: "Tokyo",
     icon: Japanlogo,
     color: "#fff8f8",
+    cities: [
+      "Tokyo",
+      "Osaka",
+      "Sapporo",
+      "Sendai",
+    ],
   },
   {
     name: "India",
     capital: "New Delhi",
     icon: Indialogo,
     color: "#973a00",
+    cities: [
+      "New Delhi",
+      "Calcutta",
+      "Madurai",
+      "Mumbai",
+    ],
   },
   {
     name: "Egypt",
     capital: "Cairo",
     icon: Egyptlogo,
     color: "#c78700",
+    cities: [
+      "Cairo",
+      "Alexandria",
+      "Asyut",
+      "Assuan",
+    ],
   },
   {
     name: "China",
-    capital: "Bejing",
+    capital: "Beijing",
     icon: Chinalogo,
     color: "#119b00",
-  }
+    cities: [
+      "Beijing",
+      "Shangai",
+      "Wuhan",
+      "Yinchuan",
+    ],
+  },
+  {
+    name: "Canada",
+    capital: "Ottawa",
+    icon: Canadalogo,
+    color: "#ffc9c9",
+    cities: [
+      "Ottawa",
+      "Vancouver",
+      "Toronto",
+      "Terranova",
+    ],
+  },
+  {
+    name: "Brazil",
+    capital: "Brasília",
+    icon: Brazillogo,
+    color: "#3fec00",
+    cities: [
+      "Brasília",
+      "São Paulo",
+      "Rio de Janeiro",
+      "Salvador",
+    ],
+  },
+  {
+    name: "Russia",
+    capital: "Moscow",
+    icon: Russialogo,
+    color: "#f4d400",
+    cities: [
+      "Moscow",
+      "Saint Petersburg",
+      "Novosibirsk",
+      "Samara",
+    ],
+  },
+  {
+    name: "Greece",
+    capital: "Athens",
+    icon: Greecelogo,
+    color: "#a5dcff",
+    cities: [
+      "Athens",
+      "Sparta",
+      "Cyprus",
+      "Thessaloniki",
+    ],
+  },
+  {
+    name: "Hong Kong",
+    capital: "Hong Kong",
+    icon: HongKonglogo,
+    color: "#ffca6b",
+    cities: [
+      "Hong Kong",
+      "Taiwan",
+      "Singapore",
+      "Bangkok",
+    ],
+  },
+  {
+    name: "Norway",
+    capital: "Oslo",
+    icon: Norwaylogo,
+    color: "#b30008",
+    cities: [
+      "Oslo",
+      "Stockholm",
+      "Helsinki",
+      "Copenaghen",
+    ],
+  },
+  {
+    name: "Germany",
+    capital: "Berlin",
+    icon: Germanylogo,
+    color: "#676553",
+    cities: [
+      "Berlin",
+      "Hamburg",
+      "Vienna",
+      "Zurich",
+    ],
+  },
+  {
+    name: "Sumeria",
+    capital: "Uruk",
+    icon: Sumerialogo,
+    color: "#fd900e",
+    cities: [
+      "Uruk",
+      "Jemdet Nasr",
+      "Abu Dhabi",
+      "Doha",
+    ],
+  },
 ]

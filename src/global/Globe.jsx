@@ -46,7 +46,7 @@ const WireframeSphere = ({ radius }) => {
 };
 
 // Main Globe component
-const Globe = ({ selectedState, missiles, bases, basePosition}) => {
+const Globe = ({ missiles, bases, shootingBase=null }) => {
   const radius = 2; // Radius of the globe
 
   return (
@@ -65,30 +65,24 @@ const Globe = ({ selectedState, missiles, bases, basePosition}) => {
         {/* Render all active missiles */}
         {missiles.map((missile, index) => (
           <Missile
-            key={index} // Unique key for each missile
+            key={index}
             startLatLon={missile.missileData.startLatLon} // Use missileData from the server payload
             radius={radius}
             initialVelocity={missile.missileData.initialVelocity} // Use missileData from the server payload
             launched={true} // Indicate that the missile is launched
+            lineColor={states.find(state => state.name === missile.name)?.color ?? "grey"}
           />
         ))}
 
-        {/* Render all player bases */}
-        {bases.filter((base) => !areEqual(base.startLatLon, basePosition)).map((base, index) => (
+        {bases.map((base, index) => (
           <Base
-            key={index} // Unique key for each base
+            key={index}
             startLatLon={base.startLatLon}
             radius={radius}
             color={states.find(state => state.name === base.name)?.color ?? "grey"}
+            highlighted={base.city === shootingBase}
           />
         ))}
-        {basePosition && (
-          <Base
-            startLatLon={basePosition}
-            radius={radius}
-            color={states.find(state => state.name === selectedState)?.color ?? "blue"}
-          />
-        )}
       </Canvas>
     </>
   );
